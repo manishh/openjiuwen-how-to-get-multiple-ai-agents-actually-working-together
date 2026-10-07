@@ -1,0 +1,11 @@
+name: verify
+on: [push, workflow_dispatch]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build reviewer image
+        run: docker build -f Dockerfile.reviewer -t tutorial-verify .
+      - name: Install deps and run smoke test in reviewer container
+        run: docker run --rm -v $GITHUB_WORKSPACE:/workspace -w /workspace tutorial-verify sh -c "pip install workswarm==0.2.6 pytest && pip install pytest && (pytest tests/smoke_test.py -v; rc=\$?; if [ \$rc -eq 5 ]; then PYTHONPATH=/workspace python tests/smoke_test.py; else exit \$rc; fi)"

@@ -1,0 +1,46 @@
+# ~/.jiuwenswarm/config/config.yaml
+#
+# Example WorkSwarm (formerly JiuwenSwarm) model configuration for this tutorial.
+# Copy it to ~/.jiuwenswarm/config/config.yaml before running jiuwenswarm-init;
+# init merges it with the default config, so none of your settings are lost.
+#
+# You can also add providers in the Web UI at http://localhost:5173 under
+# Settings > Models.
+#
+# Supported providers: OpenAI, DeepSeek, DashScope, SiliconFlow,
+# InferenceAffinity, OpenRouter and Huawei Cloud MaaS, plus any
+# OpenAI-compatible endpoint. Full reference:
+#   https://github.com/openJiuwen-ai/jiuwenswarm/blob/develop/docs/en/Configuration.md
+#
+# Credentials come from environment variables (${VAR}); never commit raw API
+# keys. Export them before you start the services:
+#   export OPENAI_API_KEY=your-openai-key
+#   export DEEPSEEK_API_KEY=your-deepseek-key
+#
+# Model choice is per agent() call, not per role: every agent() call runs on
+# the default model (is_default: true) unless that call passes
+# options={"model": "<alias>"}. The `label=` on a call only names the step.
+
+models:
+  defaults:
+    # Default model. All three Teammates in this tutorial run on it.
+    - model_client_config:
+        model_name: gpt-4o
+        # Up to the version level only; WorkSwarm appends /chat/completions.
+        api_base: https://api.openai.com/v1
+        api_key: ${OPENAI_API_KEY}
+        client_provider: OpenAI
+      model_config_obj: {}
+      is_default: true
+
+    # Optional cheaper model for the summarizer step. To use it, pass
+    # options={"model": "light"} on the data_summarizer agent() call.
+    # Remove this entry if you only want to configure one provider.
+    - model_client_config:
+        model_name: deepseek-chat
+        api_base: https://api.deepseek.com/v1
+        api_key: ${DEEPSEEK_API_KEY}
+        client_provider: DeepSeek
+      model_config_obj: {}
+      alias: light
+      is_default: false
